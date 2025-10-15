@@ -1,7 +1,8 @@
-import Html5QrcodePlugin from '@/components/Html5QrcodePlugin';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import Alerts from '../components/Alert';
+import Html5QrcodePlugin from '../components/Html5QrcodePlugin';
 
 interface ScannerProps {
     currentActivity?: {
@@ -16,19 +17,38 @@ interface ScannerProps {
 
 export default function Scanner({ currentActivity }: ScannerProps) {
     const [scannedResults, setScannedResults] = useState<string[]>([]);
-    const [message, setMessage] = useState<string | null>(null);
+    const [showMessage, setMessage] = useState<string | null>(null);
+    const scannedSet = useRef<Set<string>>(new Set());
+    const successSound = useRef<HTMLAudioElement>(new Audio('/sounds/success.mp3'));
+    const errorSound = useRef<HTMLAudioElement>(new Audio('/sounds/error.mp3'));
+    const [alert, setAlert] = useState<{
+        type: 'success' | 'warning' | 'error';
+        title: string;
+        message: string;
+        show: boolean;
+    }>({ type: 'success', title: '', message: '', show: false });
+    const showAlert = (type: 'success' | 'warning' | 'error', title: string, message: string) => {
+        setAlert({ type, title, message, show: true });
+    };
 
     const handleScanSuccess = async (decodedText: string) => {
         if (!currentActivity) {
-            setMessage('No active recruitment activity!');
+            showAlert('error', 'No Activity!', 'No active recruitment activity!');
+            errorSound.current.play();
             return;
         }
 
-        if (scannedResults.includes(decodedText)) {
-            setMessage('Already scanned!');
+        // Ignore if already scanned in this session
+        if (scannedSet.current.has(decodedText)) {
+            showAlert('warning', 'Duplicate Scan!', 'This QR code has already been scanned in this event!');
+            errorSound.current.play();
             return;
         }
 
+        showAlert('success', 'Scan Successful!', 'QR code scanned successfully!');
+        successSound.current.play();
+
+        scannedSet.current.add(decodedText);
         setScannedResults((prev) => [decodedText, ...prev]);
         setMessage(null);
 
@@ -48,16 +68,27 @@ export default function Scanner({ currentActivity }: ScannerProps) {
             );
             setMessage('Scan successful!');
         } catch (error: any) {
-            console.error(error);
-            setMessage(error.response?.data?.message || 'Scan failed!');
+            if (error.response?.status === 409) {
+                setMessage('This QR code has already been scanned!');
+            } else {
+                console.error(error);
+                setMessage(error.response?.data?.message || 'Scan failed!');
+            }
         }
     };
 
     return (
         <>
             <Head title="QR Scanner" />
-            <div className="flex min-h-screen flex-col items-center justify-start bg-[#FDFDFC] p-2 pt-24 text-[#1b1b18] sm:pt-32 md:pt-40">
+            <div className="relative flex min-h-screen flex-col items-center justify-start bg-[#FDFDFC] p-2 pt-24 text-[#1b1b18] sm:pt-32 md:pt-40">
                 <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-gray-200 p-2 shadow-sm">
+                    <Alerts
+                        type={alert.type}
+                        title={alert.title}
+                        message={alert.message}
+                        show={alert.show}
+                        onClose={() => setAlert((prev) => ({ ...prev, show: false }))}
+                    />
                     <div className="mb-6 flex flex-col items-center">
                         <img src="/images/work.png" alt="Scanner Logo" className="mb-3 h-12 w-30" />
                     </div>
@@ -70,8 +101,6 @@ export default function Scanner({ currentActivity }: ScannerProps) {
                             qrCodeSuccessCallback={handleScanSuccess}
                         />
                     </div>
-
-                    {message && <p className="mb-2 text-center text-sm font-medium text-blue-600">{message}</p>}
 
                     <div className="max-h-32 space-y-2 overflow-y-auto">
                         {scannedResults.length === 0 ? (
