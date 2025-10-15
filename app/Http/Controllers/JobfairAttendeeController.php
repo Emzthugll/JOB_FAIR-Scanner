@@ -25,7 +25,7 @@ public function store(Request $request)
     if ($existing) {
         return response()->json([
             'message' => 'Applicant already scanned!',
-        ], 409); // 409 Conflict
+        ], 409); 
     }
 
     $attendee = JobfairRecruitmentAttendee::create([
