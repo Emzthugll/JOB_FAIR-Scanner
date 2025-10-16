@@ -15,6 +15,11 @@ public function store(Request $request)
         'recruitment_activity_id' => 'required|integer|exists:recruitment_activities,id',
         'applicant_profile_id' => 'required|integer|exists:applicant_profiles,id',
         'status' => 'required|string|max:50',
+
+    ], [
+        'recruitment_activity_id.exists' => 'The selected recruitment activity does not exist.',
+        'applicant_profile_id.integer' => 'Oops! Please scan a valid applicant QR code.',
+    
     ]);
 
     // Check if this applicant is already scanned for this activity

@@ -6,7 +6,7 @@ interface Html5QrcodePluginProps {
     qrbox?: number | { width: number; height: number } | null;
     aspectRatio?: number;
     disableFlip?: boolean;
-    verbose?: boolean;
+    verbose?: false;
     qrCodeSuccessCallback: (decodedText: string, decodedResult?: any) => void;
     qrCodeErrorCallback?: (errorMessage: string) => void;
 }
@@ -29,11 +29,21 @@ const Html5QrcodePlugin: React.FC<Html5QrcodePluginProps> = (props) => {
         }
 
         const config = createConfig(props);
-        const verbose = props.verbose === true;
+        const verbose = props.verbose === false;
 
         const html5QrcodeScanner = new Html5QrcodeScanner(qrcodeRegionId, config, verbose);
 
-        html5QrcodeScanner.render(props.qrCodeSuccessCallback, props.qrCodeErrorCallback);
+        //  Wrap the error callback to include vibration
+        const errorHandler = (errorMessage: string) => {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(150); // vibrate briefly on error
+            }
+            if (props.qrCodeErrorCallback) {
+                props.qrCodeErrorCallback(errorMessage);
+            }
+        };
+
+        html5QrcodeScanner.render(props.qrCodeSuccessCallback, errorHandler);
 
         // Make the scanner div fill the container
         const container = document.getElementById(qrcodeRegionId);
