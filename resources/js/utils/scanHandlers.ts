@@ -11,15 +11,19 @@ interface HandleScanDeps {
 export const handleScanSuccess = async (decodedText: string, deps: HandleScanDeps) => {
     const { currentActivity, scannedSet, showAlert, successSound, errorSound } = deps;
 
+    const vibrate = (duration = 200) => {
+        if ('vibrate' in navigator) navigator.vibrate(duration);
+    };
+
     if (!currentActivity) {
+        vibrate(200);
         showAlert('error', 'No Activity!', 'No active recruitment activity!');
         errorSound.play();
         return;
     }
 
-    if ('vibrate' in navigator) navigator.vibrate(200);
-
     if (scannedSet.current.has(decodedText)) {
+        vibrate(150);
         showAlert('warning', 'Duplicate Scan!', 'This QR code has already been scanned in this session!');
         errorSound.play();
         return;
@@ -29,7 +33,7 @@ export const handleScanSuccess = async (decodedText: string, deps: HandleScanDep
         await axios.post(
             '/jobfair/attendees',
             {
-                applicant_profile_id: decodedText,
+                qr_token: decodedText,
                 recruitment_activity_id: currentActivity.id,
                 status: 'scanned',
             },
@@ -41,6 +45,7 @@ export const handleScanSuccess = async (decodedText: string, deps: HandleScanDep
         );
 
         scannedSet.current.add(decodedText);
+        vibrate(100);
         showAlert('success', 'Scan Successful!', 'QR code scanned successfully!');
         successSound.play();
     } catch (error: any) {
