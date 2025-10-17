@@ -43,10 +43,10 @@ export default function Scanner({ currentActivity }: ScannerProps) {
             successSound: successSound.current,
             errorSound: errorSound.current,
         }).finally(() => {
-            // unlock scanning after 3 seconds
+            // Scan delay
             setTimeout(() => {
                 isScanning.current = false;
-            }, 3000);
+            }, 4000);
         });
     };
 

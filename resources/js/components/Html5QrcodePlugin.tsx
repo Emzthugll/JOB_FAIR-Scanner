@@ -36,7 +36,7 @@ const Html5QrcodePlugin: React.FC<Html5QrcodePluginProps> = (props) => {
         //  Wrap the error callback to include vibration
         const errorHandler = (errorMessage: string) => {
             if ('vibrate' in navigator) {
-                navigator.vibrate(150); // vibrate briefly on error
+                navigator.vibrate(150);
             }
             if (props.qrCodeErrorCallback) {
                 props.qrCodeErrorCallback(errorMessage);
@@ -59,7 +59,6 @@ const Html5QrcodePlugin: React.FC<Html5QrcodePluginProps> = (props) => {
         };
     }, []);
 
-    // Fill its parent container fully
     return <div id={qrcodeRegionId} className="h-full w-full" />;
 };
 

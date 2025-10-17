@@ -14,6 +14,7 @@ class JobfairRecruitmentAttendee extends Model
     protected $fillable = [
         'recruitment_activity_id',
         'applicant_profile_id',
+        'qr_token',
         'status',
     ];
 }
