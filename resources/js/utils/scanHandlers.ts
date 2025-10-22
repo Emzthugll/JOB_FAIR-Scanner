@@ -35,7 +35,7 @@ export const handleScanSuccess = async (decodedText: string, deps: HandleScanDep
             {
                 qr_token: decodedText,
                 recruitment_activity_id: currentActivity.id,
-                status: 'scanned',
+                status: 'Attended',
             },
             {
                 headers: {
