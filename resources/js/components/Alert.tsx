@@ -38,7 +38,7 @@ export default function Alerts({ type, title, message, show, onClose }: AlertPro
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
-                    className={`absolute top-1/2 left-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border p-4 text-center shadow-lg ${bgColors[type]}`}
+                    className={`relative w-80 rounded-xl border p-4 text-center shadow-lg ${bgColors[type]}`}
                 >
                     <div className="flex flex-col items-center">
                         {icons[type]}

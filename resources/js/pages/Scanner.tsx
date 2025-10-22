@@ -1,9 +1,8 @@
 import AppLayout from '@/layouts/AppLayout';
-import { Head } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import Alerts from '../components/Alert';
 import Html5QrcodePlugin from '../components/Html5QrcodePlugin';
-import { handleScanSuccess } from '../utils/scanHandlers';
+import { handleScanSuccess } from '../utils/scanAlerts';
 import { getTotalScannedAttendees } from '../utils/scannedAttendees';
 
 interface ScannerProps {
@@ -32,19 +31,16 @@ export default function Scanner({ currentActivity }: ScannerProps) {
         show: false,
     });
 
-    // Show alert helper
     const showAlert = (type: 'success' | 'warning' | 'error', title: string, message: string) => {
         setAlert({ type, title, message, show: true });
     };
 
-    // Fetch total scanned for the current activity
     const fetchTotalScanned = async () => {
         if (!currentActivity) return;
         const total = await getTotalScannedAttendees(currentActivity.id);
         setTotalScanned(total);
     };
 
-    // Handle QR code success
     const onQrCodeSuccess = (decodedText: string) => {
         if (isScanning.current) return;
         isScanning.current = true;
@@ -58,40 +54,48 @@ export default function Scanner({ currentActivity }: ScannerProps) {
         }).finally(() => {
             setTimeout(() => {
                 isScanning.current = false;
-                fetchTotalScanned(); // update total after scan
+                fetchTotalScanned();
             }, 4000);
         });
     };
 
-    // Fetch total scanned on activity change
     useEffect(() => {
         fetchTotalScanned();
     }, [currentActivity]);
 
     return (
         <AppLayout>
-            <Head title="QR Scanner" />
+            <div className="mt-10 flex w-full flex-col items-center justify-center">
+                <div className="relative flex flex-col items-center justify-center">
+                    {alert.show && (
+                        <div className="absolute inset-0 z-50 flex items-center justify-center">
+                            <Alerts
+                                type={alert.type}
+                                title={alert.title}
+                                message={alert.message}
+                                show={alert.show}
+                                onClose={() => setAlert((prev) => ({ ...prev, show: false }))}
+                            />
+                        </div>
+                    )}
 
-            <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
-                <Alerts
-                    type={alert.type}
-                    title={alert.title}
-                    message={alert.message}
-                    show={alert.show}
-                    onClose={() => setAlert((prev) => ({ ...prev, show: false }))}
-                />
+                    {/* Scanner container  */}
+                    <div className="rounded-2xl border-4 border-[#084896] bg-white p-3 shadow-lg">
+                        <div className="flex items-center justify-center sm:h-70 sm:w-80 md:h-[350px] md:w-[400px]">
+                            <Html5QrcodePlugin
+                                fps={10}
+                                qrbox={{ width: 230, height: 230 }}
+                                disableFlip={false}
+                                verbose={false}
+                                qrCodeSuccessCallback={onQrCodeSuccess}
+                            />
+                        </div>
+                    </div>
 
-                <div className="mb-4 h-[50vh] w-full overflow-hidden">
-                    <Html5QrcodePlugin
-                        fps={10}
-                        qrbox={{ width: 200, height: 200 }}
-                        disableFlip={false}
-                        verbose={false}
-                        qrCodeSuccessCallback={onQrCodeSuccess}
-                    />
-                </div>
-                <div className="mb-2 rounded-md border border-[#084896] bg-[#084896] text-center">
-                    <p className="text-lg font-semibold text-white">Total Scanned Attendees: {totalScanned}</p>
+                    {/* Total scanned counter */}
+                    <div className="mt-4 w-44 rounded-md border border-[#084896] bg-[#084896] p-1 text-center text-sm text-white">
+                        Total Scanned: {totalScanned}
+                    </div>
                 </div>
             </div>
         </AppLayout>
