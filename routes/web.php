@@ -7,3 +7,5 @@ use App\Http\Controllers\JobfairAttendeeController;
 Route::get('/',[ScannerController::class, 'index'])->name('home');
 
 Route::post('/jobfair/attendees',[JobfairAttendeeController::class,'store'])->name('jobfair.attendees.store');
+
+Route::get('/jobfair/{id}/total-scanned', [JobfairAttendeeController::class, 'totalScannedAttendees'])->name('jobfair.attendees.totalScanned');
