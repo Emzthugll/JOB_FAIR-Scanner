@@ -1,8 +1,10 @@
+import AppLayout from '@/layouts/AppLayout';
 import { Head } from '@inertiajs/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Alerts from '../components/Alert';
 import Html5QrcodePlugin from '../components/Html5QrcodePlugin';
 import { handleScanSuccess } from '../utils/scanHandlers';
+import { getTotalScannedAttendees } from '../utils/scannedAttendees';
 
 interface ScannerProps {
     currentActivity?: {
@@ -21,6 +23,8 @@ export default function Scanner({ currentActivity }: ScannerProps) {
     const errorSound = useRef<HTMLAudioElement>(new Audio('/sounds/error.mp3'));
     const isScanning = useRef(false);
 
+    const [totalScanned, setTotalScanned] = useState(0);
+
     const [alert, setAlert] = useState({
         type: 'success' as 'success' | 'warning' | 'error',
         title: '',
@@ -28,10 +32,19 @@ export default function Scanner({ currentActivity }: ScannerProps) {
         show: false,
     });
 
+    // Show alert helper
     const showAlert = (type: 'success' | 'warning' | 'error', title: string, message: string) => {
         setAlert({ type, title, message, show: true });
     };
 
+    // Fetch total scanned for the current activity
+    const fetchTotalScanned = async () => {
+        if (!currentActivity) return;
+        const total = await getTotalScannedAttendees(currentActivity.id);
+        setTotalScanned(total);
+    };
+
+    // Handle QR code success
     const onQrCodeSuccess = (decodedText: string) => {
         if (isScanning.current) return;
         isScanning.current = true;
@@ -43,41 +56,44 @@ export default function Scanner({ currentActivity }: ScannerProps) {
             successSound: successSound.current,
             errorSound: errorSound.current,
         }).finally(() => {
-            // Scan delay
             setTimeout(() => {
                 isScanning.current = false;
+                fetchTotalScanned(); // update total after scan
             }, 4000);
         });
     };
 
+    // Fetch total scanned on activity change
+    useEffect(() => {
+        fetchTotalScanned();
+    }, [currentActivity]);
+
     return (
-        <>
+        <AppLayout>
             <Head title="QR Scanner" />
-            <div className="relative flex min-h-screen flex-col items-center justify-start bg-[#FDFDFC] p-2 pt-24 text-[#1b1b18] sm:pt-32 md:pt-40">
-                <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-gray-200 p-2 shadow-sm">
-                    <Alerts
-                        type={alert.type}
-                        title={alert.title}
-                        message={alert.message}
-                        show={alert.show}
-                        onClose={() => setAlert((prev) => ({ ...prev, show: false }))}
+
+            <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
+                <Alerts
+                    type={alert.type}
+                    title={alert.title}
+                    message={alert.message}
+                    show={alert.show}
+                    onClose={() => setAlert((prev) => ({ ...prev, show: false }))}
+                />
+
+                <div className="mb-4 h-[50vh] w-full overflow-hidden">
+                    <Html5QrcodePlugin
+                        fps={10}
+                        qrbox={{ width: 200, height: 200 }}
+                        disableFlip={false}
+                        verbose={false}
+                        qrCodeSuccessCallback={onQrCodeSuccess}
                     />
-
-                    <div className="mb-6 flex flex-col items-center">
-                        <img src="/images/work.png" alt="Scanner Logo" className="mt-3 mb-1 h-12 w-30" />
-                    </div>
-
-                    <div className="mb-4 h-[50vh] w-full overflow-hidden">
-                        <Html5QrcodePlugin
-                            fps={10}
-                            qrbox={{ width: 250, height: 250 }}
-                            disableFlip={false}
-                            verbose={false}
-                            qrCodeSuccessCallback={onQrCodeSuccess}
-                        />
-                    </div>
+                </div>
+                <div className="mb-2 rounded-md border border-[#084896] bg-[#084896] text-center">
+                    <p className="text-lg font-semibold text-white">Total Scanned Attendees: {totalScanned}</p>
                 </div>
             </div>
-        </>
+        </AppLayout>
     );
 }
