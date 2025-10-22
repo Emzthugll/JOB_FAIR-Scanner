@@ -56,14 +56,15 @@ class JobfairAttendeeController extends Controller
 
     // total scanned attendees    
     public function totalScannedAttendees($recruitmentActivityId)
-    {
-        $total = JobfairRecruitmentAttendee::where('recruitment_activity_id', $recruitmentActivityId)
-            ->where('status', 'Attended')
-            ->count();
+{
+    $total = JobfairRecruitmentAttendee::where('recruitment_activity_id', $recruitmentActivityId)
+        ->where('status', 'Attended')
+        ->count();
 
-        return response()->json([
-            'recruitment_activity_id' => $recruitmentActivityId,
-            'total_scanned_attendees' => $total,
-        ]);
-    }
+    return response()->json([
+        'recruitment_activity_id' => $recruitmentActivityId,
+        'total_scanned_attendees' => $total,
+    ]);
+}
+
 }
