@@ -1,9 +1,8 @@
 import { useSidebar } from '@/context/SidebarContext';
 import { Link } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 const AppHeader: React.FC = () => {
-    const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
     const { isMobileOpen, isExpanded, toggleSidebar, toggleMobileSidebar } = useSidebar();
     const inputRef = useRef<HTMLInputElement>(null);
 
