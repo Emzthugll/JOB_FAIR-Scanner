@@ -4,6 +4,32 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Your custom scrollbar */
+.scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: #084896 #f1f1f1;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #084896;
+    border-radius: 4px;
+    border: 2px solid #f1f1f1;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background-color: #084896;
 }
