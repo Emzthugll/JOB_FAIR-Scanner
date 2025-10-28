@@ -11,12 +11,13 @@ class SummaryController extends Controller
 {
     public function index()
     {
-        $today = Carbon::today();
+        $now = Carbon::now();
 
-        // Get today's activity
-        $todaysActivity = RecruitmentActivity::whereDate('start', '<=', $today)
-            ->whereDate('end', '>=', $today)
-            ->first();
+        $todaysActivity = RecruitmentActivity::where('start', '<=', $now)
+        ->where('end', '>=', $now)
+        ->orderBy('start', 'desc')
+        ->first();
+
 
         $totalScanned = 0;
         $activityType = null;
