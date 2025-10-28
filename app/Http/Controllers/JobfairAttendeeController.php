@@ -67,4 +67,15 @@ class JobfairAttendeeController extends Controller
     ]);
 }
 
+public function getScannedApplicants($jobfairId)
+    {
+
+        $scannedApplicants = JobfairRecruitmentAttendee::with('applicantProfile.educationalBackground','applicantProfile.jobPreference','applicantProfile.user')
+            ->where('recruitment_activity_id', $jobfairId)
+            ->where('status', 'Attended')
+            ->get();
+
+        return response()->json($scannedApplicants);
+    }
+
 }
