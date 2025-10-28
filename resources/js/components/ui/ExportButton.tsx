@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 interface ExportButtonProps {
@@ -7,17 +7,27 @@ interface ExportButtonProps {
 }
 
 const ExportButton: React.FC<ExportButtonProps> = ({ activityId, search }) => {
+  const [clicked, setClicked] = useState(false);
+
   const handleExport = () => {
+    setClicked(true); // Trigger animation
     const params = new URLSearchParams();
     if (activityId) params.append("activity_id", activityId);
     if (search) params.append("search", search);
 
+    // Start download
     window.location.href = `/export-jobfair?${params.toString()}`;
+
+    // Reset button after 1 second (adjust time to match animation)
+    setTimeout(() => setClicked(false), 1000);
   };
 
   return (
     <StyledWrapper>
-      <button onClick={handleExport} className="download-btn pixel-corners">
+      <button
+        onClick={handleExport}
+        className={`download-btn pixel-corners ${clicked ? "clicked" : ""}`}
+      >
         <div className="button-content">
           <div className="svg-container">
             <svg
@@ -81,16 +91,19 @@ const StyledWrapper = styled.div`
     transition: opacity ease-in-out 250ms;
   }
 
-  /* hover state for the button */
-  .download-btn:hover .button-content {
+  /* hover or clicked state for the button */
+  .download-btn:hover .button-content,
+  .download-btn.clicked .button-content {
     transform: translateY(0px);
   }
 
-  .download-btn:hover .text {
+  .download-btn:hover .text,
+  .download-btn.clicked .text {
     opacity: 0;
   }
 
-  .download-btn:hover .download-icon {
+  .download-btn:hover .download-icon,
+  .download-btn.clicked .download-icon {
     opacity: 1;
   }
 
@@ -99,22 +112,11 @@ const StyledWrapper = styled.div`
   }
 
   @keyframes heartbeat {
-    0% {
-      transform: scale(1);
-      transform-origin: center center;
-    }
-    10% {
-      transform: scale(0.91);
-    }
-    17% {
-      transform: scale(0.98);
-    }
-    33% {
-      transform: scale(0.87);
-    }
-    45% {
-      transform: scale(1);
-    }
+    0% { transform: scale(1); transform-origin: center center; }
+    10% { transform: scale(0.91); }
+    17% { transform: scale(0.98); }
+    33% { transform: scale(0.87); }
+    45% { transform: scale(1); }
   }
 `;
 
