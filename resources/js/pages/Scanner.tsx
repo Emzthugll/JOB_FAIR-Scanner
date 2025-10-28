@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/AppLayout';
 import { useEffect, useRef, useState } from 'react';
-import Alerts from '../components/Alert';
+import Alerts from '../components/ui/Alert';
 import Html5QrcodePlugin from '../components/Html5QrcodePlugin';
 import { handleScanSuccess } from '../utils/scanAlerts';
 import { getTotalScannedAttendees } from '../utils/scannedAttendees';
@@ -65,8 +65,8 @@ export default function Scanner({ currentActivity }: ScannerProps) {
 
     return (
         <AppLayout>
-            <div className="mt-10 flex w-full flex-col items-center justify-center">
-                <div className="relative flex flex-col items-center justify-center">
+            <div className="mt-10 flex w-full flex-col items-center justify-center px-4 sm:px-6">
+                <div className="relative flex w-full max-w-md flex-col items-center justify-center">
                     {alert.show && (
                         <div className="absolute inset-0 z-50 flex items-center justify-center">
                             <Alerts
@@ -79,12 +79,12 @@ export default function Scanner({ currentActivity }: ScannerProps) {
                         </div>
                     )}
 
-                    {/* Scanner container  */}
-                    <div className="rounded-2xl border-4 border-[#084896] bg-white p-3 shadow-lg">
-                        <div className="flex items-center justify-center sm:h-70 sm:w-80 md:h-[350px] md:w-[400px]">
+                    {/* Scanner container */}
+                    <div className="w-full rounded-2xl border-4 border-[#084896] bg-white p-3 shadow-lg">
+                        <div className="flex aspect-square h-90 w-full items-center justify-center">
                             <Html5QrcodePlugin
                                 fps={10}
-                                qrbox={{ width: 230, height: 230 }}
+                                qrbox={{ width: 250, height: 250 }}
                                 disableFlip={false}
                                 verbose={false}
                                 qrCodeSuccessCallback={onQrCodeSuccess}
@@ -93,7 +93,7 @@ export default function Scanner({ currentActivity }: ScannerProps) {
                     </div>
 
                     {/* Total scanned counter */}
-                    <div className="mt-4 w-44 rounded-md border border-[#084896] bg-[#084896] p-1 text-center text-sm text-white">
+                    <div className="mt-4 w-full max-w-xs rounded-md border border-[#084896] bg-[#084896] p-2 text-center text-sm text-white">
                         Total Scanned: {totalScanned}
                     </div>
                 </div>
