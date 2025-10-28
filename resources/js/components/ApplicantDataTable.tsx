@@ -26,13 +26,14 @@ const ApplicantDataTable: React.FC = () => {
         <div className="flex justify-center">
             <div className="w-full max-w-[1000px]">
                 {/* Filters */}
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h3 className="text-lg font-semibold text-slate-800">Scanned Applicants</h3>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+
+                    <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
                         <select
                             value={activityId}
                             onChange={(e) => setActivityId(e.target.value)}
-                            className="w-full rounded border border-[#084896] px-3 py-2 text-sm sm:w-auto"
+                            className="w-full rounded border border-[#084896] px-3 py-2 text-sm sm:w-auto sm:min-w-[200px]"
                         >
                             <option value="">All Activities</option>
                             {activities?.map((a: any) => (
@@ -47,8 +48,9 @@ const ApplicantDataTable: React.FC = () => {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search..."
-                            className="w-full rounded border border-[#084896] px-3 py-2 text-sm sm:w-auto"
+                            className="w-full rounded border border-[#084896] px-3 py-2 text-sm sm:w-auto sm:min-w-[200px]"
                         />
+
                         <ExportButton activityId={activityId} search={search} />
                     </div>
                 </div>
