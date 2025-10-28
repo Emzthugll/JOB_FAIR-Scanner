@@ -1,6 +1,6 @@
 import { useSidebar } from '@/context/SidebarContext';
 import { Link, usePage } from '@inertiajs/react';
-import { Folder, ScanQrCode } from 'lucide-react';
+import { ChartSpline, Folder, ScanQrCode } from 'lucide-react';
 
 type NavItem = {
     name: string;
@@ -11,6 +11,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     { icon: <ScanQrCode />, name: 'Scanner', path: '/' },
+    { icon: <ChartSpline />, name: 'Statistics', path: '/statistics' },
     { icon: <Folder />, name: 'Reports', path: '/reports' },
 ];
 
@@ -19,7 +20,7 @@ const AppSidebar: React.FC = () => {
 
     return (
         <aside
-            className={`fixed top-0 left-0 z-50 flex h-full flex-col border-r border-gray-200 bg-[#084896] px-5 text-gray-900 transition-transform duration-300 ease-in-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:transition-[width] lg:duration-300 lg:ease-in-out ${isExpanded || isHovered ? 'lg:w-[290px]' : 'lg:w-[90px]'} mt-16 lg:mt-0`}
+            className={`fixed top-0 left-0 z-50 flex h-full flex-col bg-[#084896] px-5 text-gray-900 transition-transform duration-300 ease-in-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:transition-[width] lg:duration-300 lg:ease-in-out ${isExpanded || isHovered ? 'lg:w-[290px]' : 'lg:w-[90px]'} mt-16 lg:mt-0`}
             onMouseEnter={() => !isExpanded && setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -46,7 +47,8 @@ const AppSidebar: React.FC = () => {
                     <ul className="flex flex-col gap-2">
                         {navItems.map((nav) => {
                             const { url } = usePage();
-                            const isActive = url === nav.path;
+                            const pathname = new URL(url, window.location.origin).pathname;
+                            const isActive = pathname === nav.path;
 
                             return (
                                 <li key={nav.name}>

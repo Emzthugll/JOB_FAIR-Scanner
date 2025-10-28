@@ -26,8 +26,8 @@ const AppHeader: React.FC = () => {
     }, []);
 
     return (
-        <header className="sticky top-0 z-50 flex h-16 w-full items-center bg-[#084896] px-2 lg:px-6">
-            <div className="flex w-full items-center justify-between lg:justify-start">
+        <header className="sticky top-0 z-50 flex h-16 w-full items-center bg-[#084896] px-2 md:px-4 lg:px-6">
+            <div className="relative flex w-full items-center justify-between lg:justify-start">
                 {/* Sidebar toggle button */}
                 <button
                     className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#084896] lg:hidden"
@@ -39,7 +39,7 @@ const AppHeader: React.FC = () => {
 
                 {/* Logo */}
                 {!isExpanded && !isMobileOpen && (
-                    <div className="absolute left-1/2 -translate-x-1/2 transform lg:static lg:ml-4 lg:translate-x-0">
+                    <div className="absolute left-1/2 -translate-x-1/2 transform md:static md:ml-4 md:translate-x-0">
                         <Link href="/">
                             <img className="h-8 dark:hidden" src="/images/workin.webp" alt="Logo" />
                             <img className="hidden h-8 dark:block" src="/images/workin.webp" alt="Logo" />
