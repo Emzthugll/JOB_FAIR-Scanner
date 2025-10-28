@@ -3,36 +3,48 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 use App\Models\JobfairRecruitmentAttendee;
-use App\Models\RecruitmentActivity; 
-use Carbon\Carbon;
+use App\Models\RecruitmentActivity;
 
 class ReportsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $today = Carbon::today();
+        $query = JobfairRecruitmentAttendee::with(
+            'applicantProfile',
+            'applicantProfile.educationalBackground',
+            'applicantProfile.jobPreference',
+            'applicantProfile.user',
+            'recruitmentActivity'
+        )->where('status', 'Attended');
 
-    // Get today's activity
-    $todaysActivity = RecruitmentActivity::whereDate('start', '<=', $today)
-        ->whereDate('end', '>=', $today)
-        ->first();
+        // Filter by activity only
+        if ($request->filled('activity_id')) {
+            $query->where('recruitment_activity_id', $request->activity_id);
+        }
+        
 
-    $totalScanned = 0;
-    $activityType = null;
+        // Filter 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('applicantProfile', function($q) use ($search) {
+                $q->where('firstname', 'like', "%$search%")
+                  ->orWhere('surname', 'like', "%$search%")
+                  ->orWhere('midname', 'like', "%$search%")
+                  ->orWhereHas('user', fn($q2) => $q2->where('email', 'like', "%$search%"));
+                  
+            });
+        }
 
-    if ($todaysActivity) {
-        $totalScanned = JobfairRecruitmentAttendee::where('recruitment_activity_id', $todaysActivity->id)
-            ->where('status', 'Attended')
-            ->count();
+        // Paginate
+        $perPage = $request->input('per_page', 10);
+        $scannedApplicants = $query->paginate($perPage);
 
-        $activityType = $todaysActivity->type; 
-    }
-
-    return Inertia::render('Reports', [
-        'recruitmentActivityId' => $todaysActivity?->id ?? null,
-        'totalScannedToday' => $totalScanned,
-        'activityType' => $activityType, 
-    ]);
+        return Inertia::render('Reports', [
+            'scannedApplicants' => $scannedApplicants,
+            'activities' => RecruitmentActivity::all(),
+            'filters' => $request->only(['activity_id', 'search']),
+        ]);
     }
 }

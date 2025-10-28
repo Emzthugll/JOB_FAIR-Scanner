@@ -59,7 +59,7 @@ const Html5QrcodePlugin: React.FC<Html5QrcodePluginProps> = (props) => {
         };
     }, []);
 
-    return <div id={qrcodeRegionId} className="h-full w-full" />;
+    return <div id={qrcodeRegionId} className="h-full w-full rounded-md" />;
 };
 
 export default Html5QrcodePlugin;
