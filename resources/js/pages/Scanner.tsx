@@ -1,29 +1,31 @@
 import AppLayout from '@/layouts/AppLayout';
 import { useEffect, useRef, useState } from 'react';
-import Alerts from '../components/ui/Alert';
 import Html5QrcodePlugin from '../components/Html5QrcodePlugin';
+import Alerts from '../components/ui/Alert';
 import { handleScanSuccess } from '../utils/scanAlerts';
 import { getTotalScannedAttendees } from '../utils/scannedAttendees';
 
-interface ScannerProps {
-    currentActivity?: {
-        id: number;
-        type: string;
-        start: string;
-        end: string;
-        venue: string;
-        details: string;
-    };
+interface EventType {
+    id: number;
+    type: string;
+    start: string;
+    end: string;
+    venue: string;
+    details: string;
 }
 
-export default function Scanner({ currentActivity }: ScannerProps) {
+interface PageProps {
+    currentActivity: EventType;
+}
+
+export default function Scanner({ currentActivity: initialActivity }: PageProps) {
+    const [currentActivity, setCurrentActivity] = useState<EventType>(initialActivity);
     const scannedSet = useRef<Set<string>>(new Set());
     const successSound = useRef<HTMLAudioElement>(new Audio('/sounds/success.mp3'));
     const errorSound = useRef<HTMLAudioElement>(new Audio('/sounds/error.mp3'));
     const isScanning = useRef(false);
 
     const [totalScanned, setTotalScanned] = useState(0);
-
     const [alert, setAlert] = useState({
         type: 'success' as 'success' | 'warning' | 'error',
         title: '',
@@ -35,13 +37,20 @@ export default function Scanner({ currentActivity }: ScannerProps) {
         setAlert({ type, title, message, show: true });
     };
 
-    const fetchTotalScanned = async () => {
-        if (!currentActivity) return;
-        const total = await getTotalScannedAttendees(currentActivity.id);
+    // Fetch total scanned based on the event
+    const fetchTotalScanned = async (activityId?: number) => {
+        const id = activityId || currentActivity?.id;
+        if (!id) return;
+        const total = await getTotalScannedAttendees(id);
         setTotalScanned(total);
     };
 
     const onQrCodeSuccess = (decodedText: string) => {
+        if (!currentActivity) {
+            showAlert('warning', 'No Event Selected', 'Please select an event first.');
+            return;
+        }
+
         if (isScanning.current) return;
         isScanning.current = true;
 
@@ -54,14 +63,22 @@ export default function Scanner({ currentActivity }: ScannerProps) {
         }).finally(() => {
             setTimeout(() => {
                 isScanning.current = false;
-                fetchTotalScanned();
+                fetchTotalScanned(currentActivity.id);
             }, 4000);
         });
     };
 
+    // Refresh total scanned when currentActivity changes
     useEffect(() => {
-        fetchTotalScanned();
+        fetchTotalScanned(currentActivity.id);
     }, [currentActivity]);
+
+    // Function to switch event (e.g., after PIN verification)
+    const handleSwitchEvent = (event: EventType) => {
+        setCurrentActivity(event);
+        setTotalScanned(0);
+        scannedSet.current.clear(); // Clear previously scanned codes
+    };
 
     return (
         <AppLayout>
