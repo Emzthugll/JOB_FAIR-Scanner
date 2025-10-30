@@ -1,3 +1,4 @@
+import { ActivityProvider } from '@/context/ActivityContext';
 import { SidebarProvider, useSidebar } from '@/context/SidebarContext';
 import AppHeader from '@/layouts/AppHeader';
 import AppSidebar from '@/layouts/AppSidebar';
@@ -18,9 +19,7 @@ const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 } ${isMobileOpen ? 'ml-0' : ''}`}
             >
                 <AppHeader />
-                <div className="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
-                    {children} {/* <-- Replace Outlet with children */}
-                </div>
+                <div className="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">{children}</div>
             </div>
         </div>
     );
@@ -28,9 +27,11 @@ const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <SidebarProvider>
-            <LayoutContent>{children}</LayoutContent>
-        </SidebarProvider>
+        <ActivityProvider>
+            <SidebarProvider>
+                <LayoutContent>{children}</LayoutContent>
+            </SidebarProvider>
+        </ActivityProvider>
     );
 };
 
