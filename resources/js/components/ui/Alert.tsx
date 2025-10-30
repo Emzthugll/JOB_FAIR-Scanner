@@ -25,7 +25,7 @@ export default function Alerts({ type, title, message, show, onClose }: AlertPro
 
     useEffect(() => {
         if (show) {
-            const timer = setTimeout(onClose, 2500); // auto-hide after 2.5 seconds
+            const timer = setTimeout(onClose, 2500); 
             return () => clearTimeout(timer);
         }
     }, [show, onClose]);

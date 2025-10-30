@@ -21,4 +21,14 @@ class RecruitmentActivity extends Model
     ];
 
     public $timestamps = true;
+
+
+    public function scannerTokens()
+{
+    return $this->hasMany(ScannerToken::class);
 }
+}
+
+
+
+

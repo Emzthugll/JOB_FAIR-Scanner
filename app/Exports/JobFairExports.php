@@ -28,10 +28,10 @@ public function query()
 {
     $query = JobfairRecruitmentAttendee::query()
         ->with('applicantProfile.educationalBackground', 'applicantProfile.jobPreference')
-        ->where('status', 'Attended') // only scanned applicants
+        ->where('status', 'Attended') 
         ->orderBy('created_at', 'desc');
 
-    // Filter by activity if provided
+    // Filter by activity 
     if ($this->activityId) {
         $query->where('recruitment_activity_id', $this->activityId);
     }
@@ -120,7 +120,7 @@ public function query()
         'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
         'fill' => [
             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-            'startColor' => ['rgb' => '4F81BD'],
+            'startColor' => ['rgb' => '084896'],
         ],
     ]);
 

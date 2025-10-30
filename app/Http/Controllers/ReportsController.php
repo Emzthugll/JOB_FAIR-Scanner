@@ -25,17 +25,21 @@ class ReportsController extends Controller
         }
         
 
-        // Filter 
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('applicantProfile', function($q) use ($search) {
-                $q->where('firstname', 'like', "%$search%")
-                  ->orWhere('surname', 'like', "%$search%")
-                  ->orWhere('midname', 'like', "%$search%")
-                  ->orWhereHas('user', fn($q2) => $q2->where('email', 'like', "%$search%"));
-                  
-            });
-        }
+    $search = $request->search;
+    $query->whereHas('applicantProfile', function($q) use ($search) {
+        $q->where(function($q2) use ($search) {
+            $q2->where('firstname', 'like', "%{$search}%")
+               ->orWhere('midname', 'like', "%{$search}%")
+               ->orWhere('surname', 'like', "%{$search}%")
+               ->orWhere('contact_number', 'like', "%{$search}%")
+               ->orWhereHas('user', function($q3) use ($search) {
+                   $q3->where('email', 'like', "%{$search}%");
+               });
+        });
+    });
+}
+
 
         // Paginate
         $perPage = $request->input('per_page', 10);
