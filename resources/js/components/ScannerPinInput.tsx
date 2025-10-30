@@ -43,7 +43,7 @@ const ScannerPinInput: React.FC<ScannerPinInputProps> = ({ length = 4, onComplet
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
             <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-xl bg-white p-6 shadow-lg sm:p-8">
-                <img className="h-12 w-12 object-contain" src="/images/work.png" alt="Logo" />
+                <img className="h-25 w-30 object-contain" src="/images/work.png" alt="Logo" />
                 <h2 className="text-center text-lg font-extrabold text-gray-700 sm:text-xl">Please Input Your 4-Digit PIN</h2>
                 <p className="text-center text-sm font-medium text-gray-500">You can get the code from the Peso Admin.</p>
 
