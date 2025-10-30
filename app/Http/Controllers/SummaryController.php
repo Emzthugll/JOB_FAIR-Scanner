@@ -2,38 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\RecruitmentActivity;
 use App\Models\JobfairRecruitmentAttendee;
-use App\Models\RecruitmentActivity; 
-use Carbon\Carbon;
 
 class SummaryController extends Controller
 {
-    public function index()
-    {
-        $now = Carbon::now();
+ public function index()
+{
+    $activityId = session('current_activity_id');
 
-        $todaysActivity = RecruitmentActivity::where('start', '<=', $now)
-        ->where('end', '>=', $now)
-        ->orderBy('start', 'desc')
-        ->first();
-
-
-        $totalScanned = 0;
-        $activityType = null;
-
-        if ($todaysActivity) {
-            $totalScanned = JobfairRecruitmentAttendee::where('recruitment_activity_id', $todaysActivity->id)
-                ->where('status', 'Attended')
-                ->count();
-
-            $activityType = $todaysActivity->type; 
-        }
-
+    if (!$activityId) {
         return Inertia::render('Statistics', [
-            'recruitmentActivityId' => $todaysActivity?->id ?? null,
-            'totalScannedToday' => $totalScanned,
-            'activityType' => $activityType, 
+            'totalScannedToday' => 0,
+            'activityType' => null,
         ]);
     }
+
+    $activity = RecruitmentActivity::find($activityId);
+
+    if (!$activity) {
+        return Inertia::render('Statistics', [
+            'totalScannedToday' => 0,
+            'activityType' => null,
+        ]);
+    }
+
+    $totalScanned = JobfairRecruitmentAttendee::where('recruitment_activity_id', $activityId)
+        ->where('status', 'Attended')
+        ->count();
+
+    return Inertia::render('Statistics', [
+        'totalScannedToday' => $totalScanned,
+        'activityType' => $activity->type,
+    ]);
 }
+
+}
+
+
+
+
