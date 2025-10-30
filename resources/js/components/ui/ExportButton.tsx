@@ -10,7 +10,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ activityId, search }) => {
   const [clicked, setClicked] = useState(false);
 
   const handleExport = () => {
-    setClicked(true); // Trigger animation
+    setClicked(true); 
     const params = new URLSearchParams();
     if (activityId) params.append("activity_id", activityId);
     if (search) params.append("search", search);
@@ -18,7 +18,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ activityId, search }) => {
     // Start download
     window.location.href = `/export-jobfair?${params.toString()}`;
 
-    // Reset button after 1 second (adjust time to match animation)
+    
     setTimeout(() => setClicked(false), 1000);
   };
 
