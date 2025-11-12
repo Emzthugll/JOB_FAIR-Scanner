@@ -9,50 +9,42 @@ use App\Models\ApplicantProfile;
 class JobfairAttendeeController extends Controller
 {
     public function store(Request $request)
-    {
-        // Validate input
-        $request->validate([
-            'recruitment_activity_id' => 'required|integer|exists:recruitment_activities,id',
-            'qr_token' => 'required|string',
-            'status' => 'required|string|max:50',
-        ], [
-            'recruitment_activity_id.exists' => 'The selected recruitment activity does not exist.',
-            'qr_token.required' => 'Oops! Please scan a valid applicant QR code.',
-        ]);
+{
+    $request->validate([
+        'recruitment_activity_id' => 'required|integer|exists:recruitment_activities,id',
+        'qr_token' => 'required|string',
+        'status' => 'required|string|max:50',
+    ], [
+        'recruitment_activity_id.exists' => 'The selected recruitment activity does not exist.',
+        'qr_token.required' => 'Oops! Please scan a valid applicant QR code.',
+    ]);
 
-        // Find applicant by QR token
-        $applicant = ApplicantProfile::where('qr_token', $request->qr_token)->first();
+    // Find attendee by QR token for this event
+    $attendee = JobfairRecruitmentAttendee::where('qr_token', $request->qr_token)
+        ->where('recruitment_activity_id', $request->recruitment_activity_id)
+        ->first();
 
-        if (!$applicant) {
-            return response()->json([
-                'message' => 'Invalid QR token. Applicant not found.',
-            ], 404);
-        }
-
-        // Check if this applicant is already scanned for this activity
-        $existing = JobfairRecruitmentAttendee::where('recruitment_activity_id', $request->recruitment_activity_id)
-            ->where('applicant_profile_id', $applicant->id)
-            ->first();
-
-        if ($existing) {
-            return response()->json([
-                'message' => 'Applicant already scanned!',
-            ], 409);
-        }
-
-        // Save scan record
-        $attendee = JobfairRecruitmentAttendee::create([
-            'recruitment_activity_id' => $request->recruitment_activity_id,
-            'applicant_profile_id' => $applicant->id,
-            'qr_token' => $request->qr_token,
-            'status' => $request->status,
-        ]);
-
+    if (!$attendee) {
         return response()->json([
-            'message' => 'Attendee saved successfully',
-            'attendee' => $attendee
-        ]);
+            'message' => 'Invalid QR token for this event.',
+        ], 404);
     }
+
+    if ($attendee->status === 'Attended') {
+        return response()->json([
+            'message' => 'Applicant already scanned!',
+        ], 409);
+    }
+
+    // Mark as scanned
+    $attendee->status = $request->status; 
+
+    return response()->json([
+        'message' => 'Attendee scanned successfully',
+        'attendee' => $attendee,
+    ]);
+}
+
 
     // total scanned attendees    
     public function totalScannedAttendees($recruitmentActivityId)
