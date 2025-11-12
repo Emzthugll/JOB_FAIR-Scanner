@@ -33,6 +33,10 @@ export default function Scanner({ currentActivity: initialActivity }: PageProps)
         show: false,
     });
 
+    
+    const scannerRef = useRef<HTMLDivElement>(null);
+    const [qrBoxSize, setQrBoxSize] = useState(250);
+
     const showAlert = (type: 'success' | 'warning' | 'error', title: string, message: string) => {
         setAlert({ type, title, message, show: true });
     };
@@ -73,17 +77,24 @@ export default function Scanner({ currentActivity: initialActivity }: PageProps)
         fetchTotalScanned(currentActivity.id);
     }, [currentActivity]);
 
-    // Function to switch event (e.g., after PIN verification)
-    const handleSwitchEvent = (event: EventType) => {
-        setCurrentActivity(event);
-        setTotalScanned(0);
-        scannedSet.current.clear(); // Clear previously scanned codes
-    };
+    // Dynamically update QR box size
+    useEffect(() => {
+        const updateQrBoxSize = () => {
+            if (!scannerRef.current) return;
+            const width = scannerRef.current.offsetWidth;
+            const boxSize = Math.min(width * 0.8, 300); // 80% of container, max 300px
+            setQrBoxSize(boxSize);
+        };
+
+        updateQrBoxSize();
+        window.addEventListener('resize', updateQrBoxSize);
+        return () => window.removeEventListener('resize', updateQrBoxSize);
+    }, []);
 
     return (
         <AppLayout>
             <div className="mt-10 flex w-full flex-col items-center justify-center px-4 sm:px-6">
-                <div className="relative flex w-full max-w-md flex-col items-center justify-center">
+                <div className="relative flex w-full max-w-md flex-col items-center justify-center" ref={scannerRef}>
                     {alert.show && (
                         <div className="absolute inset-0 z-50 flex items-center justify-center">
                             <Alerts
@@ -98,14 +109,16 @@ export default function Scanner({ currentActivity: initialActivity }: PageProps)
 
                     {/* Scanner container */}
                     <div className="w-full rounded-2xl border-4 border-[#084896] bg-white p-3 shadow-lg">
-                        <div className="flex aspect-square h-90 w-full items-center justify-center">
-                            <Html5QrcodePlugin
-                                fps={10}
-                                qrbox={{ width: 250, height: 250 }}
-                                disableFlip={false}
-                                verbose={false}
-                                qrCodeSuccessCallback={onQrCodeSuccess}
-                            />
+                        <div className="relative w-full pb-[100%]">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Html5QrcodePlugin
+                                    fps={10}
+                                    qrbox={{ width: qrBoxSize, height: qrBoxSize }}
+                                    disableFlip={false}
+                                    verbose={false}
+                                    qrCodeSuccessCallback={onQrCodeSuccess}
+                                />
+                            </div>
                         </div>
                     </div>
 
