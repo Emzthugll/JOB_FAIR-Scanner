@@ -21,16 +21,23 @@ const PinPage: React.FC = () => {
                 body: JSON.stringify({ pin }),
             });
 
-            const data = await res.json();
+            
+            let data;
+            try {
+                data = await res.json();
+            } catch {
+                throw new Error('Invalid response');
+            }
 
             if (res.ok && data.success) {
                 // Redirect to scanner page for this activity
                 window.location.href = data.redirect;
             } else {
-                setError(data.message || 'Invalid PIN');
+                // Use backend message or fallback
+                setError(data.message || 'Invalid or expired PIN.');
             }
         } catch {
-            setError('Invalid PIN/The PIN is Expired.');
+            setError('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -39,8 +46,6 @@ const PinPage: React.FC = () => {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
             <ScannerPinInput onComplete={handlePinSubmit} disabled={loading} error={!!error} clearError={() => setError(null)} />
-
-            {error && <p className="mt-2 font-bold text-red-500">{error}</p>}
         </div>
     );
 };
