@@ -70,7 +70,7 @@ const ScannerPinInput: React.FC<ScannerPinInputProps> = ({ length = 4, onComplet
                 </div>
 
                 {/* Error message below inputs */}
-                {error && <p className="mt-2 text-center text-sm font-bold text-red-500">{errorMessage || 'Invalid PIN. Please try again.'}</p>}
+                {error && <p className="mt-3 text-center text-sm font-semibold text-red-500">{errorMessage || 'Invalid or expired PIN.'}</p>}
             </div>
         </div>
     );
