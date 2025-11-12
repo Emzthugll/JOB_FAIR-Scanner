@@ -1,27 +1,33 @@
-import { LucideIcon } from 'lucide-react';
-import { FC, ReactNode } from 'react';
+"use client";
+
+import * as React from "react";
+import { Card as UiCard, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 
 interface SummaryCardProps {
-    title: string;
-    value?: number | string;
-    icon: LucideIcon;
-    children?: ReactNode;
+  title?: string;
+  footerText?: string;
+  children?: React.ReactNode;
+  className?: string;
 }
 
-const SummaryCard: FC<SummaryCardProps> = ({ title, value, icon: Icon, children }) => {
-    return (
-        <div className="shadow-3xl shadow-shadow-500 rounded-2xl border border-gray-200 p-5 shadow-lg shadow-gray-400 md:p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#084896]">
-                <Icon className="h-6 w-6 text-white" />
-            </div>
+const SummaryCard: React.FC<SummaryCardProps> = ({ title, footerText, children, className }) => {
+  return (
+    <UiCard className={`p-4 bg-gray-50 shadow-lg flex flex-col justify-between ${className}`}>
+      {title && (
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg font-bold ">{title}</CardTitle>
+        </CardHeader>
+      )}
 
-            <div className="mt-3 flex flex-col">
-                {value !== undefined && <h4 className="mt-2 text-2xl font-bold text-green-500">{value}</h4>}
-                {children}
-                <span className="mt-5 text-sm text-gray-500">{title}</span>
-            </div>
-        </div>
-    );
+      <CardContent className="flex-1 flex items-center justify-center">
+        {children}
+      </CardContent>
+
+      {footerText && (
+        <div className="text-center text-sm text-gray-500 pt-2">{footerText}</div>
+      )}
+    </UiCard>
+  );
 };
 
 export default SummaryCard;
