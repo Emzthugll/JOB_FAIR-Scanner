@@ -10,13 +10,15 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-    { icon: <ScanQrCode />, name: 'Scanner', path: '/' },
+    { icon: <ScanQrCode />, name: 'Scanner', path: '/scanner' }, // updated
     { icon: <ChartSpline />, name: 'Statistics', path: '/statistics' },
     { icon: <Folder />, name: 'Reports', path: '/reports' },
 ];
 
 const AppSidebar: React.FC = () => {
     const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+    const { url } = usePage();
+    const pathname = new URL(url, window.location.origin).pathname;
 
     return (
         <aside
@@ -24,12 +26,13 @@ const AppSidebar: React.FC = () => {
             onMouseEnter={() => !isExpanded && setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
+            {/* Logo */}
             <div
                 className={`flex items-center py-8 ${
                     isMobileOpen ? 'justify-center' : !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
                 }`}
             >
-                <Link href="/">
+                <Link href="/reports">
                     {isExpanded || isHovered || isMobileOpen ? (
                         <>
                             <img className="dark:hidden" src="/images/workin.webp" alt="Logo" width={150} height={40} />
@@ -46,9 +49,7 @@ const AppSidebar: React.FC = () => {
                 <nav className="mb-6">
                     <ul className="flex flex-col gap-2">
                         {navItems.map((nav) => {
-                            const { url } = usePage();
-                            const pathname = new URL(url, window.location.origin).pathname;
-                            const isActive = pathname === nav.path;
+                            const isActive = pathname.startsWith(nav.path || '');
 
                             return (
                                 <li key={nav.name}>
